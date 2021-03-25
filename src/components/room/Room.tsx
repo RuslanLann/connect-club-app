@@ -1,16 +1,13 @@
 import React, { FC } from 'react';
 import { View, StyleSheet, Image, ViewStyle, ImageStyle } from 'react-native';
-import { VideoCircle } from '..';
 
-import { sizes } from '../../constants';
-
-const VIDEO_CIRCLE_SIZE = sizes.SCREEN_WIDTH / 15;
+import VideoCircle from '../video-circle/VideoCircle';
 
 const Room: FC = () => {
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="stretch" />
-      <VideoCircle size={VIDEO_CIRCLE_SIZE} />
+      <VideoCircle size={30} />
     </View>
   );
 };

@@ -1,26 +1,27 @@
 import React, { FC } from 'react';
 import { View, StyleSheet, Image, ViewStyle, ImageStyle } from 'react-native';
+import { VideoCircle } from '..';
 
 import { sizes } from '../../constants';
+
+const VIDEO_CIRCLE_SIZE = sizes.SCREEN_WIDTH / 15;
 
 const Room: FC = () => {
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="cover" />
+      <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="stretch" />
+      <VideoCircle size={VIDEO_CIRCLE_SIZE} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: sizes.SCREEN_WIDTH / 4,
-    height: sizes.SCREEN_HEIGHT / 4,
-    overflow: 'hidden',
-    backgroundColor: 'red',
+    flex: 1,
   } as ViewStyle,
   image: {
-    width: sizes.SCREEN_WIDTH / 2,
-    height: sizes.SCREEN_HEIGHT / 2,
+    width: '100%',
+    height: '100%',
   } as ImageStyle,
 });
 

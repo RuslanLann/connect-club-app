@@ -4,6 +4,7 @@ import { TapGestureHandler } from 'react-native-gesture-handler';
 import Animated, { Easing, useAnimatedGestureHandler, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import VideoCircle from '../video-circle/VideoCircle';
+import VisibleArea from '../visible-area/VisibleArea';
 import { sizes } from '../../constants';
 
 const Room: FC = () => {
@@ -26,6 +27,7 @@ const Room: FC = () => {
     <TapGestureHandler onGestureEvent={eventHandler}>
       <Animated.View style={styles.container}>
         <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="stretch" />
+        <VisibleArea />
         <VideoCircle size={sizes.VIDEO_CIRCLE_SIZE} circleCoords={{ x, y }} />
       </Animated.View>
     </TapGestureHandler>

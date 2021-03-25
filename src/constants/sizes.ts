@@ -13,6 +13,8 @@ const ROOM_VISIBLE_PART_HEIGHT = height / 4;
 
 const IMAGE_RATIO = 2.165;
 
+const VIDEO_CIRCLE_SIZE = 30;
+
 export default {
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
@@ -22,4 +24,5 @@ export default {
   ROOM_VISIBLE_PART_WIDTH,
   ROOM_VISIBLE_PART_HEIGHT,
   IMAGE_RATIO,
+  VIDEO_CIRCLE_SIZE,
 };

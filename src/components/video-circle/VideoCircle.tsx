@@ -10,14 +10,11 @@ import Animated, {
 
 interface IVideoCircle {
   size?: number;
+  circleCoords: ICircleCoordinates;
 }
 
-const startingPosition = 0;
-
-const VideoCircle: FC<IVideoCircle> = ({ size = 5 }) => {
+const VideoCircle: FC<IVideoCircle> = ({ size = 5, circleCoords: { x, y } }) => {
   const pressed = useSharedValue(false);
-  const x = useSharedValue(startingPosition);
-  const y = useSharedValue(startingPosition);
   const scale = useSharedValue(1);
 
   const eventHandler = useAnimatedGestureHandler({

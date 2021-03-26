@@ -14,12 +14,10 @@ interface IVideoCircle {
 }
 
 const VideoCircle: FC<IVideoCircle> = ({ size = 5, circleCoords: { x, y } }) => {
-  const pressed = useSharedValue(false);
   const scale = useSharedValue(1);
 
   const eventHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
-      pressed.value = true;
       ctx.startX = x.value;
       ctx.startY = y.value;
       scale.value = withSpring(0.9);
@@ -29,7 +27,6 @@ const VideoCircle: FC<IVideoCircle> = ({ size = 5, circleCoords: { x, y } }) => 
       y.value = ctx.startY + event.translationY;
     },
     onEnd: (event, ctx) => {
-      pressed.value = false;
       x.value = ctx.startX + event.translationX;
       y.value = ctx.startY + event.translationY;
       scale.value = withSpring(1);

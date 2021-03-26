@@ -3,8 +3,16 @@ import { Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { animationConstants, sizes } from '../../constants';
+import { animationUtils } from '../../utils';
 
 const { animationTimingOptions } = animationConstants;
+const {
+  getHorizontalRightBorder,
+  getHorizontalLeftBorder,
+  getVerticalBorder,
+  calcIsInRightCorner,
+  calcIsInLeftCorner,
+} = animationUtils;
 
 interface IMiniMap {
   circleCoords: ICoordinates;
@@ -61,14 +69,12 @@ const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
   const animatedCircleCoordsStyles = useAnimatedStyle(() => {
     const { x, y } = circleCoordsWithRatio.value;
 
-    const horizontalRightBorder =
-      (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
-    const horizontalLeftBorder = (sizes.MINI_MAP_WIDTH + sizes.PADDING) / sizes.MINI_MAP_RATIO;
-    const verticalBorder =
-      (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
+    const horizontalRightBorder = getHorizontalRightBorder(sizes.VIDEO_CIRCLE_SIZE);
+    const horizontalLeftBorder = getHorizontalLeftBorder();
+    const verticalBorder = getVerticalBorder(sizes.VIDEO_CIRCLE_SIZE);
 
-    const isInRightCorner = x > horizontalRightBorder && y > verticalBorder;
-    const isInLeftCorner = x < horizontalLeftBorder && y > verticalBorder;
+    const isInRightCorner = calcIsInRightCorner({ x, y, horizontalRightBorder, verticalBorder });
+    const isInLeftCorner = calcIsInLeftCorner({ x, y, horizontalLeftBorder, verticalBorder });
 
     if (isInRightCorner) {
       isCircleInRightCorner.value = true;
@@ -89,14 +95,12 @@ const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
   const animatedVisibleAreaStyles = useAnimatedStyle(() => {
     const { x, y } = visibleAreaCoordsWithRatio.value;
 
-    const horizontalRightBorder =
-      (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VISIBLE_AREA_WIDTH) / sizes.MINI_MAP_RATIO;
-    const horizontalLeftBorder = (sizes.MINI_MAP_WIDTH + sizes.PADDING) / sizes.MINI_MAP_RATIO;
-    const verticalBorder =
-      (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VISIBLE_AREA_HEIGHT) / sizes.MINI_MAP_RATIO;
+    const horizontalRightBorder = getHorizontalRightBorder(sizes.VISIBLE_AREA_WIDTH);
+    const horizontalLeftBorder = getHorizontalLeftBorder();
+    const verticalBorder = getVerticalBorder(sizes.VISIBLE_AREA_HEIGHT);
 
-    const isInRightCorner = x > horizontalRightBorder && y > verticalBorder;
-    const isInLeftCorner = x < horizontalLeftBorder && y > verticalBorder;
+    const isInRightCorner = calcIsInRightCorner({ x, y, horizontalRightBorder, verticalBorder });
+    const isInLeftCorner = calcIsInLeftCorner({ x, y, horizontalLeftBorder, verticalBorder });
 
     if (isInRightCorner) {
       isVisibleAreaInRightCorner.value = true;

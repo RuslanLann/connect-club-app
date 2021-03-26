@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     left: -sizes.SCREEN_WIDTH,
   },
   rightHiddenArea: {
-    top: 0,
+    top: -5,
     right: -sizes.SCREEN_WIDTH * 3,
   },
   bottomHiddenArea: {
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     left: -sizes.SCREEN_WIDTH,
   },
   leftHiddenArea: {
-    top: 0,
+    top: -5,
     left: -sizes.SCREEN_WIDTH * 3,
   },
 });

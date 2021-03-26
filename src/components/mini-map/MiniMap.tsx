@@ -4,14 +4,18 @@ import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming
 
 import { animationConstants, sizes } from '../../constants';
 
+const { animationTimingOptions } = animationConstants;
+
 interface IMiniMap {
   circleCoords: ICoordinates;
   visibleAreaCoords: ICoordinates;
 }
 
 const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
-  const isVisibleAreaInMiniMapZone = useSharedValue(false);
-  const isCircleInMiniMapZone = useSharedValue(false);
+  const isVisibleAreaInRightCorner = useSharedValue(false);
+  const isCircleInRightCorner = useSharedValue(false);
+  const isVisibleAreaInLeftCorner = useSharedValue(false);
+  const isCircleInLeftCorner = useSharedValue(false);
 
   const visibleAreaCoordsWithRatio = useDerivedValue(() => {
     return { x: visibleAreaCoords.x.value / sizes.MINI_MAP_RATIO, y: visibleAreaCoords.y.value / sizes.MINI_MAP_RATIO };
@@ -21,50 +25,88 @@ const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
   });
 
   const animatedMiniMapStyles = useAnimatedStyle(() => {
-    const leftCorner = -sizes.SCREEN_WIDTH + sizes.MINI_MAP_WIDTH + sizes.PADDING * 2;
+    let translateXValue = 0,
+      translateYValue = 0;
+    const bottomrightCorner = { x: 0, y: 0 };
+    const bottomLeftCorner = { x: sizes.MINI_MAP_LEFT_POSITION, y: 0 };
+    const topLeftCorner = { x: sizes.MINI_MAP_LEFT_POSITION, y: sizes.MINI_MAP_TOP_POSITION };
 
-    const translateXValue = isVisibleAreaInMiniMapZone.value || isCircleInMiniMapZone.value ? leftCorner : 0;
+    if (
+      (isVisibleAreaInRightCorner.value || isCircleInRightCorner.value) &&
+      !isVisibleAreaInLeftCorner.value &&
+      !isCircleInLeftCorner.value
+    ) {
+      translateXValue = bottomLeftCorner.x;
+      translateYValue = bottomLeftCorner.y;
+    } else if (
+      (isVisibleAreaInLeftCorner.value && isCircleInRightCorner.value) ||
+      (isVisibleAreaInRightCorner.value && isCircleInLeftCorner.value)
+    ) {
+      translateXValue = topLeftCorner.x;
+      translateYValue = topLeftCorner.y;
+    } else {
+      // default MiniMap corner
+      translateYValue = bottomrightCorner.x;
+      translateYValue = bottomrightCorner.y;
+    }
+
     return {
-      transform: [{ translateX: withTiming(translateXValue, animationConstants.animationTimingOptions) }],
+      transform: [
+        { translateX: withTiming(translateXValue, animationTimingOptions) },
+        { translateY: withTiming(translateYValue, animationTimingOptions) },
+      ],
     };
   });
 
   const animatedCircleCoordsStyles = useAnimatedStyle(() => {
     const { x, y } = circleCoordsWithRatio.value;
 
-    const horizontalBorder =
+    const horizontalRightBorder =
       (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
+    const horizontalLeftBorder = (sizes.MINI_MAP_WIDTH + sizes.PADDING) / sizes.MINI_MAP_RATIO;
     const verticalBorder =
       (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
 
-    const horizontalBorderCross = x > horizontalBorder;
-    const verticalBorderCross = y > verticalBorder;
+    const isInRightCorner = x > horizontalRightBorder && y > verticalBorder;
+    const isInLeftCorner = x < horizontalLeftBorder && y > verticalBorder;
 
-    if (horizontalBorderCross && verticalBorderCross) {
-      isCircleInMiniMapZone.value = true;
+    if (isInRightCorner) {
+      isCircleInRightCorner.value = true;
+      isCircleInLeftCorner.value = false;
+    } else if (isInLeftCorner) {
+      isCircleInRightCorner.value = false;
+      isCircleInLeftCorner.value = true;
     } else {
-      isCircleInMiniMapZone.value = false;
+      isCircleInRightCorner.value = false;
+      isCircleInLeftCorner.value = false;
     }
 
     return {
       transform: [{ translateX: x }, { translateY: y }],
     };
   });
+
   const animatedVisibleAreaStyles = useAnimatedStyle(() => {
     const { x, y } = visibleAreaCoordsWithRatio.value;
 
-    const horizontalBorder =
+    const horizontalRightBorder =
       (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VISIBLE_AREA_WIDTH) / sizes.MINI_MAP_RATIO;
+    const horizontalLeftBorder = (sizes.MINI_MAP_WIDTH + sizes.PADDING) / sizes.MINI_MAP_RATIO;
     const verticalBorder =
       (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VISIBLE_AREA_HEIGHT) / sizes.MINI_MAP_RATIO;
 
-    const horizontalBorderCross = x > horizontalBorder;
-    const verticalBorderCross = y > verticalBorder;
+    const isInRightCorner = x > horizontalRightBorder && y > verticalBorder;
+    const isInLeftCorner = x < horizontalLeftBorder && y > verticalBorder;
 
-    if (horizontalBorderCross && verticalBorderCross) {
-      isVisibleAreaInMiniMapZone.value = true;
+    if (isInRightCorner) {
+      isVisibleAreaInRightCorner.value = true;
+      isVisibleAreaInLeftCorner.value = false;
+    } else if (isInLeftCorner) {
+      isVisibleAreaInRightCorner.value = false;
+      isVisibleAreaInLeftCorner.value = true;
     } else {
-      isVisibleAreaInMiniMapZone.value = false;
+      isVisibleAreaInRightCorner.value = false;
+      isVisibleAreaInLeftCorner.value = false;
     }
 
     return {

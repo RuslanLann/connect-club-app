@@ -1,14 +1,15 @@
 import React, { FC } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, { useAnimatedGestureHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedGestureHandler, useAnimatedStyle } from 'react-native-reanimated';
 
 import { sizes } from '../../constants';
 
-const VisibleArea: FC = () => {
-  const x = useSharedValue(0);
-  const y = useSharedValue(0);
+interface IVisibleArea {
+  coords: ICoordinates;
+}
 
+const VisibleArea: FC<IVisibleArea> = ({ coords: { x, y } }) => {
   const eventHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
       ctx.startX = x.value;

@@ -16,6 +16,8 @@ import { animationConstants, sizes } from '../../constants';
 const Room: FC = () => {
   const circleX = useSharedValue(0);
   const circleY = useSharedValue(0);
+  const visibleAreaX = useSharedValue(0);
+  const visibleAreaY = useSharedValue(0);
   const isMiniMapVisible = useSharedValue(true);
 
   const eventHandler = useAnimatedGestureHandler({
@@ -50,9 +52,13 @@ const Room: FC = () => {
     <TapGestureHandler onGestureEvent={eventHandler}>
       <Animated.View style={styles.container}>
         <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="stretch" />
-        <VisibleArea />
-        <VideoCircle circleCoords={{ x: circleX, y: circleY }} />
-        <MiniMap animatedStyles={animatedMiniMapStyles} />
+        <VisibleArea coords={{ x: visibleAreaX, y: visibleAreaY }} />
+        <VideoCircle coords={{ x: circleX, y: circleY }} />
+        <MiniMap
+          circleCoords={{ x: circleX, y: circleY }}
+          visibleAreaCoords={{ x: visibleAreaX, y: visibleAreaY }}
+          animatedStyles={animatedMiniMapStyles}
+        />
       </Animated.View>
     </TapGestureHandler>
   );

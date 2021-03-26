@@ -7,16 +7,17 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+
 import { sizes } from '../../constants';
 import Camera from '../camera/Camera';
 
 interface IVideoCircle {
-  circleCoords: ICircleCoordinates;
+  coords: ICoordinates;
 }
 
 const SECOND_CIRCLE_SIZE = sizes.VIDEO_CIRCLE_SIZE * 3;
 
-const VideoCircle: FC<IVideoCircle> = ({ circleCoords: { x, y } }) => {
+const VideoCircle: FC<IVideoCircle> = ({ coords: { x, y } }) => {
   const scale = useSharedValue(1);
 
   const eventHandler = useAnimatedGestureHandler({

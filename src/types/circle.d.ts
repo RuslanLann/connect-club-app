@@ -1,4 +1,4 @@
-interface ICircleCoordinates {
+interface ICoordinates {
   x: {
     value: number;
   };

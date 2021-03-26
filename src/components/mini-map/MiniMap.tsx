@@ -1,20 +1,38 @@
 import React, { FC } from 'react';
 import { View, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { sizes } from '../../constants';
 
 interface IMiniMap {
   animatedStyles: {};
+  circleCoords: ICoordinates;
+  visibleAreaCoords: ICoordinates;
 }
 
-const MiniMap: FC<IMiniMap> = ({ animatedStyles }) => {
+const MiniMap: FC<IMiniMap> = ({ animatedStyles, visibleAreaCoords, circleCoords }) => {
+  const animatedcircleCoordsStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: circleCoords.x.value / sizes.MINI_MAP_RATIO },
+        { translateY: circleCoords.y.value / sizes.MINI_MAP_RATIO },
+      ],
+    };
+  });
+  const animatedVisibleAreaStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: visibleAreaCoords.x.value / sizes.MINI_MAP_RATIO },
+        { translateY: visibleAreaCoords.y.value / sizes.MINI_MAP_RATIO },
+      ],
+    };
+  });
+
   return (
     <Animated.View style={[styles.container, animatedStyles]}>
       <Image source={require('../../assets/images/room.jpeg')} style={styles.image} />
-      <View style={styles.visibleArea} />
-      <View style={styles.miniCircle} />
-      <View style={styles.closeButton} />
+      <Animated.View style={[styles.visibleArea, animatedVisibleAreaStyles]} />
+      <Animated.View style={[styles.miniCircle, animatedcircleCoordsStyles]} />
     </Animated.View>
   );
 };
@@ -52,7 +70,6 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
   } as ViewStyle,
-  closeButton: {},
 });
 
 export default MiniMap;

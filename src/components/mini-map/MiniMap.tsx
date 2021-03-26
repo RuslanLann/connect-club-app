@@ -1,18 +1,12 @@
 import React, { FC } from 'react';
 import { Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { animationConstants, sizes } from '../../constants';
-import { animationUtils } from '../../utils';
+import MiniMapCircle from './MiniMapCircle';
+import MiniMapVisibleArea from './MiniMapVisibleArea';
 
 const { animationTimingOptions } = animationConstants;
-const {
-  getHorizontalRightBorder,
-  getHorizontalLeftBorder,
-  getVerticalBorder,
-  calcIsInRightCorner,
-  calcIsInLeftCorner,
-} = animationUtils;
 
 interface IMiniMap {
   circleCoords: ICoordinates;
@@ -24,13 +18,6 @@ const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
   const isCircleInRightCorner = useSharedValue(false);
   const isVisibleAreaInLeftCorner = useSharedValue(false);
   const isCircleInLeftCorner = useSharedValue(false);
-
-  const visibleAreaCoordsWithRatio = useDerivedValue(() => {
-    return { x: visibleAreaCoords.x.value / sizes.MINI_MAP_RATIO, y: visibleAreaCoords.y.value / sizes.MINI_MAP_RATIO };
-  });
-  const circleCoordsWithRatio = useDerivedValue(() => {
-    return { x: circleCoords.x.value / sizes.MINI_MAP_RATIO, y: circleCoords.y.value / sizes.MINI_MAP_RATIO };
-  });
 
   const animatedMiniMapStyles = useAnimatedStyle(() => {
     let translateXValue = 0,
@@ -66,68 +53,22 @@ const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
     };
   });
 
-  const animatedCircleCoordsStyles = useAnimatedStyle(() => {
-    const { x, y } = circleCoordsWithRatio.value;
-
-    const horizontalRightBorder = getHorizontalRightBorder(sizes.VIDEO_CIRCLE_SIZE);
-    const horizontalLeftBorder = getHorizontalLeftBorder();
-    const verticalBorder = getVerticalBorder(sizes.VIDEO_CIRCLE_SIZE);
-
-    const isInRightCorner = calcIsInRightCorner({ x, y, horizontalRightBorder, verticalBorder });
-    const isInLeftCorner = calcIsInLeftCorner({ x, y, horizontalLeftBorder, verticalBorder });
-
-    if (isInRightCorner) {
-      isCircleInRightCorner.value = true;
-      isCircleInLeftCorner.value = false;
-    } else if (isInLeftCorner) {
-      isCircleInRightCorner.value = false;
-      isCircleInLeftCorner.value = true;
-    } else {
-      isCircleInRightCorner.value = false;
-      isCircleInLeftCorner.value = false;
-    }
-
-    return {
-      transform: [{ translateX: x }, { translateY: y }],
-    };
-  });
-
-  const animatedVisibleAreaStyles = useAnimatedStyle(() => {
-    const { x, y } = visibleAreaCoordsWithRatio.value;
-
-    const horizontalRightBorder = getHorizontalRightBorder(sizes.VISIBLE_AREA_WIDTH);
-    const horizontalLeftBorder = getHorizontalLeftBorder();
-    const verticalBorder = getVerticalBorder(sizes.VISIBLE_AREA_HEIGHT);
-
-    const isInRightCorner = calcIsInRightCorner({ x, y, horizontalRightBorder, verticalBorder });
-    const isInLeftCorner = calcIsInLeftCorner({ x, y, horizontalLeftBorder, verticalBorder });
-
-    if (isInRightCorner) {
-      isVisibleAreaInRightCorner.value = true;
-      isVisibleAreaInLeftCorner.value = false;
-    } else if (isInLeftCorner) {
-      isVisibleAreaInRightCorner.value = false;
-      isVisibleAreaInLeftCorner.value = true;
-    } else {
-      isVisibleAreaInRightCorner.value = false;
-      isVisibleAreaInLeftCorner.value = false;
-    }
-
-    return {
-      transform: [{ translateX: x }, { translateY: y }],
-    };
-  });
-
   return (
     <Animated.View style={[styles.container, animatedMiniMapStyles]}>
       <Image source={require('../../assets/images/room.jpeg')} style={styles.image} />
-      <Animated.View style={[styles.visibleArea, animatedVisibleAreaStyles]} />
-      <Animated.View style={[styles.miniCircle, animatedCircleCoordsStyles]} />
+      <MiniMapVisibleArea
+        visibleAreaCoords={visibleAreaCoords}
+        isVisibleAreaInRightCorner={isVisibleAreaInRightCorner}
+        isVisibleAreaInLeftCorner={isVisibleAreaInLeftCorner}
+      />
+      <MiniMapCircle
+        circleCoords={circleCoords}
+        isCircleInRightCorner={isCircleInRightCorner}
+        isCircleInLeftCorner={isCircleInLeftCorner}
+      />
     </Animated.View>
   );
 };
-
-const MINI_CIRCLE_SIZE = sizes.VIDEO_CIRCLE_SIZE / sizes.MINI_MAP_RATIO;
 
 const styles = StyleSheet.create({
   container: {
@@ -143,23 +84,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   } as ImageStyle,
-  visibleArea: {
-    width: sizes.MINI_MAP_WIDTH / 4,
-    height: sizes.MINI_MAP_HEIGHT / 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-  } as ViewStyle,
-  miniCircle: {
-    width: MINI_CIRCLE_SIZE,
-    height: MINI_CIRCLE_SIZE,
-    backgroundColor: 'blue',
-    borderRadius: MINI_CIRCLE_SIZE,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-  } as ViewStyle,
 });
 
 export default MiniMap;

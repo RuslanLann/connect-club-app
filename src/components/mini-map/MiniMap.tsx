@@ -1,16 +1,21 @@
 import React, { FC } from 'react';
 import { View, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { sizes } from '../../constants';
 
-const MiniMap: FC = () => {
+interface IMiniMap {
+  animatedStyles: {};
+}
+
+const MiniMap: FC<IMiniMap> = ({ animatedStyles }) => {
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, animatedStyles]}>
       <Image source={require('../../assets/images/room.jpeg')} style={styles.image} />
       <View style={styles.visibleArea} />
       <View style={styles.miniCircle} />
       <View style={styles.closeButton} />
-    </View>
+    </Animated.View>
   );
 };
 

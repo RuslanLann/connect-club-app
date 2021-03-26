@@ -8,7 +8,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { sizes } from '../../constants';
-import Camera from './Camera';
+import Camera from '../camera/Camera';
 
 interface IVideoCircle {
   circleCoords: ICircleCoordinates;

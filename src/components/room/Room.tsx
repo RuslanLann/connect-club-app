@@ -1,26 +1,49 @@
 import React, { FC } from 'react';
 import { StyleSheet, Image, ViewStyle, ImageStyle } from 'react-native';
 import { TapGestureHandler } from 'react-native-gesture-handler';
-import Animated, { Easing, useAnimatedGestureHandler, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import VideoCircle from '../video-circle/VideoCircle';
 import VisibleArea from '../visible-area/VisibleArea';
-import { sizes } from '../../constants';
+import MiniMap from '../mini-map/MiniMap';
+import { animationConstants, sizes } from '../../constants';
 
 const Room: FC = () => {
-  const x = useSharedValue(0);
-  const y = useSharedValue(0);
+  const circleX = useSharedValue(0);
+  const circleY = useSharedValue(0);
+  const isMiniMapVisible = useSharedValue(true);
 
   const eventHandler = useAnimatedGestureHandler({
-    onEnd: (event) => {
-      const animationTimingOptions = {
-        duration: 500,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-      };
+    onStart: (event, cxt) => {},
+    onActive: (event, cxt) => {
+      console.log(event.y, 'event.y <<<<');
+      const verticalBorderCross =
+        event.y > sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE;
+      const horizontalBorderCross =
+        event.x > sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE;
 
-      x.value = withTiming(event.x - sizes.VIDEO_CIRCLE_SIZE / 2, animationTimingOptions);
-      y.value = withTiming(event.y - sizes.VIDEO_CIRCLE_SIZE / 2, animationTimingOptions);
+      if (verticalBorderCross && horizontalBorderCross) {
+        isMiniMapVisible.value = false;
+      } else {
+        isMiniMapVisible.value = true;
+      }
     },
+    onEnd: (event) => {
+      circleX.value = withTiming(event.x - sizes.VIDEO_CIRCLE_SIZE / 2, animationConstants.animationTimingOptions);
+      circleY.value = withTiming(event.y - sizes.VIDEO_CIRCLE_SIZE / 2, animationConstants.animationTimingOptions);
+    },
+  });
+
+  const animatedMiniMapStyles = useAnimatedStyle(() => {
+    const translateXValue = isMiniMapVisible.value ? 0 : sizes.SCREEN_WIDTH;
+    return {
+      transform: [{ translateX: withTiming(translateXValue, animationConstants.animationTimingOptions) }],
+    };
   });
 
   return (
@@ -28,7 +51,8 @@ const Room: FC = () => {
       <Animated.View style={styles.container}>
         <Image source={require('../../assets/images/room.jpeg')} style={styles.image} resizeMode="stretch" />
         <VisibleArea />
-        <VideoCircle size={sizes.VIDEO_CIRCLE_SIZE} circleCoords={{ x, y }} />
+        <VideoCircle circleCoords={{ x: circleX, y: circleY }} />
+        <MiniMap animatedStyles={animatedMiniMapStyles} />
       </Animated.View>
     </TapGestureHandler>
   );

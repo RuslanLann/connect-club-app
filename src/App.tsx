@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
-import { Room } from './components';
+import { MiniMap, Room } from './components';
 
 const App = () => {
   return (
     <View style={styles.container}>
       <Room />
+      <MiniMap />
     </View>
   );
 };

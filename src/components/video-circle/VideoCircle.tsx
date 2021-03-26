@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedGestureHandler,
@@ -7,13 +7,16 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { sizes } from '../../constants';
+import Camera from './Camera';
 
 interface IVideoCircle {
-  size?: number;
   circleCoords: ICircleCoordinates;
 }
 
-const VideoCircle: FC<IVideoCircle> = ({ size = 5, circleCoords: { x, y } }) => {
+const SECOND_CIRCLE_SIZE = sizes.VIDEO_CIRCLE_SIZE * 3;
+
+const VideoCircle: FC<IVideoCircle> = ({ circleCoords: { x, y } }) => {
   const scale = useSharedValue(1);
 
   const eventHandler = useAnimatedGestureHandler({
@@ -41,17 +44,43 @@ const VideoCircle: FC<IVideoCircle> = ({ size = 5, circleCoords: { x, y } }) => 
 
   return (
     <PanGestureHandler onGestureEvent={eventHandler}>
-      <Animated.View style={[styles.circle, { width: size, height: size, borderRadius: size }, animatedCircleStyles]} />
+      <Animated.View style={[styles.circle, animatedCircleStyles]}>
+        <View style={styles.cameraContainer}>
+          <Camera />
+        </View>
+        <View style={styles.audibilityZone} />
+      </Animated.View>
     </PanGestureHandler>
   );
 };
 
 const styles = StyleSheet.create({
   circle: {
-    backgroundColor: 'blue',
+    width: sizes.VIDEO_CIRCLE_SIZE,
+    height: sizes.VIDEO_CIRCLE_SIZE,
     position: 'absolute',
     top: 0,
     left: 0,
+  } as ViewStyle,
+  cameraContainer: {
+    width: sizes.VIDEO_CIRCLE_SIZE,
+    height: sizes.VIDEO_CIRCLE_SIZE,
+    overflow: 'hidden',
+    borderColor: 'blue',
+    borderRadius: sizes.VIDEO_CIRCLE_SIZE,
+    borderWidth: 1,
+    zIndex: 2,
+  } as ViewStyle,
+  audibilityZone: {
+    width: SECOND_CIRCLE_SIZE,
+    height: SECOND_CIRCLE_SIZE,
+    borderRadius: SECOND_CIRCLE_SIZE,
+    backgroundColor: 'white',
+    opacity: 0.3,
+    position: 'absolute',
+    top: -(SECOND_CIRCLE_SIZE - sizes.VIDEO_CIRCLE_SIZE) / 2,
+    left: -(SECOND_CIRCLE_SIZE - sizes.VIDEO_CIRCLE_SIZE) / 2,
+    zIndex: 1,
   } as ViewStyle,
 });
 

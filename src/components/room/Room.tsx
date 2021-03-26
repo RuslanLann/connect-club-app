@@ -18,14 +18,6 @@ const Room: FC = () => {
     onEnd: (event) => {
       circleX.value = withTiming(event.x - sizes.VIDEO_CIRCLE_SIZE / 2, animationConstants.animationTimingOptions);
       circleY.value = withTiming(event.y - sizes.VIDEO_CIRCLE_SIZE / 2, animationConstants.animationTimingOptions);
-      visibleAreaX.value = withTiming(event.x - sizes.MINI_MAP_WIDTH / 2, {
-        easing: animationConstants.animationTimingOptions.easing,
-        duration: 800,
-      });
-      visibleAreaY.value = withTiming(event.y - sizes.MINI_MAP_HEIGHT / 2, {
-        easing: animationConstants.animationTimingOptions.easing,
-        duration: 800,
-      });
     },
   });
 

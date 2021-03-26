@@ -1,4 +1,4 @@
-import { Dimensions, StatusBar } from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native';
 
 const { width, height } = Dimensions.get('screen');
 const { height: windowHeight } = Dimensions.get('window');
@@ -23,7 +23,8 @@ const MINI_MAP_RATIO = 4;
 const MINI_MAP_WIDTH = SCREEN_WIDTH / MINI_MAP_RATIO;
 const MINI_MAP_HEIGHT = SCREEN_HEIGHT_WITHOUT_STATUS_BAR / MINI_MAP_RATIO;
 const MINI_MAP_LEFT_POSITION = -SCREEN_WIDTH + MINI_MAP_WIDTH + PADDING * 2;
-const MINI_MAP_TOP_POSITION = -windowHeight + MINI_MAP_HEIGHT - PADDING;
+const MINI_MAP_TOP_POSITION =
+  -windowHeight + MINI_MAP_HEIGHT - PADDING + (Platform.OS === 'ios' ? SCREEN_HEIGHT / 11 : 0);
 
 export default {
   SCREEN_WIDTH,

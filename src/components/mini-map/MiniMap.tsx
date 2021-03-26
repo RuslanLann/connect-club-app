@@ -1,38 +1,82 @@
 import React, { FC } from 'react';
-import { View, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
+import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { sizes } from '../../constants';
+import { animationConstants, sizes } from '../../constants';
 
 interface IMiniMap {
-  animatedStyles: {};
   circleCoords: ICoordinates;
   visibleAreaCoords: ICoordinates;
 }
 
-const MiniMap: FC<IMiniMap> = ({ animatedStyles, visibleAreaCoords, circleCoords }) => {
-  const animatedcircleCoordsStyles = useAnimatedStyle(() => {
+const MiniMap: FC<IMiniMap> = ({ visibleAreaCoords, circleCoords }) => {
+  const isVisibleAreaInMiniMapZone = useSharedValue(false);
+  const isCircleInMiniMapZone = useSharedValue(false);
+
+  const visibleAreaCoordsWithRatio = useDerivedValue(() => {
+    return { x: visibleAreaCoords.x.value / sizes.MINI_MAP_RATIO, y: visibleAreaCoords.y.value / sizes.MINI_MAP_RATIO };
+  });
+  const circleCoordsWithRatio = useDerivedValue(() => {
+    return { x: circleCoords.x.value / sizes.MINI_MAP_RATIO, y: circleCoords.y.value / sizes.MINI_MAP_RATIO };
+  });
+
+  const animatedMiniMapStyles = useAnimatedStyle(() => {
+    const leftCorner = -sizes.SCREEN_WIDTH + sizes.MINI_MAP_WIDTH + sizes.PADDING * 2;
+
+    const translateXValue = isVisibleAreaInMiniMapZone.value || isCircleInMiniMapZone.value ? leftCorner : 0;
     return {
-      transform: [
-        { translateX: circleCoords.x.value / sizes.MINI_MAP_RATIO },
-        { translateY: circleCoords.y.value / sizes.MINI_MAP_RATIO },
-      ],
+      transform: [{ translateX: withTiming(translateXValue, animationConstants.animationTimingOptions) }],
+    };
+  });
+
+  const animatedCircleCoordsStyles = useAnimatedStyle(() => {
+    const { x, y } = circleCoordsWithRatio.value;
+
+    const horizontalBorder =
+      (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
+    const verticalBorder =
+      (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VIDEO_CIRCLE_SIZE) / sizes.MINI_MAP_RATIO;
+
+    const horizontalBorderCross = x > horizontalBorder;
+    const verticalBorderCross = y > verticalBorder;
+
+    if (horizontalBorderCross && verticalBorderCross) {
+      isCircleInMiniMapZone.value = true;
+    } else {
+      isCircleInMiniMapZone.value = false;
+    }
+
+    return {
+      transform: [{ translateX: x }, { translateY: y }],
     };
   });
   const animatedVisibleAreaStyles = useAnimatedStyle(() => {
+    const { x, y } = visibleAreaCoordsWithRatio.value;
+
+    const horizontalBorder =
+      (sizes.SCREEN_WIDTH - sizes.MINI_MAP_WIDTH - sizes.PADDING - sizes.VISIBLE_AREA_WIDTH) / sizes.MINI_MAP_RATIO;
+    const verticalBorder =
+      (sizes.SCREEN_HEIGHT - sizes.MINI_MAP_HEIGHT - sizes.PADDING - sizes.VISIBLE_AREA_HEIGHT) / sizes.MINI_MAP_RATIO;
+
+    const horizontalBorderCross = x > horizontalBorder;
+    const verticalBorderCross = y > verticalBorder;
+
+    if (horizontalBorderCross && verticalBorderCross) {
+      isVisibleAreaInMiniMapZone.value = true;
+    } else {
+      isVisibleAreaInMiniMapZone.value = false;
+    }
+
     return {
-      transform: [
-        { translateX: visibleAreaCoords.x.value / sizes.MINI_MAP_RATIO },
-        { translateY: visibleAreaCoords.y.value / sizes.MINI_MAP_RATIO },
-      ],
+      transform: [{ translateX: x }, { translateY: y }],
     };
   });
 
   return (
-    <Animated.View style={[styles.container, animatedStyles]}>
+    <Animated.View style={[styles.container, animatedMiniMapStyles]}>
       <Image source={require('../../assets/images/room.jpeg')} style={styles.image} />
       <Animated.View style={[styles.visibleArea, animatedVisibleAreaStyles]} />
-      <Animated.View style={[styles.miniCircle, animatedcircleCoordsStyles]} />
+      <Animated.View style={[styles.miniCircle, animatedCircleCoordsStyles]} />
     </Animated.View>
   );
 };

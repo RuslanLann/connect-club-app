@@ -5,11 +5,7 @@ import Animated, { useAnimatedGestureHandler, useAnimatedStyle } from 'react-nat
 
 import { sizes } from '../../constants';
 
-interface IVisibleArea {
-  coords: ICoordinates;
-}
-
-const VisibleArea: FC<IVisibleArea> = ({ coords: { x, y } }) => {
+const VisibleArea: FC<IElementOptions> = ({ coords: { x, y } }) => {
   const eventHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
       ctx.startX = x.value;

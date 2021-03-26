@@ -11,13 +11,9 @@ import Animated, {
 import { sizes } from '../../constants';
 import Camera from '../camera/Camera';
 
-interface IVideoCircle {
-  coords: ICoordinates;
-}
-
 const SECOND_CIRCLE_SIZE = sizes.VIDEO_CIRCLE_SIZE * 3;
 
-const VideoCircle: FC<IVideoCircle> = ({ coords: { x, y } }) => {
+const VideoCircle: FC<IElementOptions> = ({ coords: { x, y } }) => {
   const scale = useSharedValue(1);
 
   const eventHandler = useAnimatedGestureHandler({
